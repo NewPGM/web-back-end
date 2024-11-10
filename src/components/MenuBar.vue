@@ -1,47 +1,52 @@
 <template>
-  <aside class="colorBG text-black p-4 rounded bottom-0 w-1/6 overflow-y-auto left-0">
-    <h1 class="text-2xl font-bold text-white text-center mb-4">Menu</h1>
-    <nav class="ConfigMenu">
-      <ul class="flex flex-col gap-2">
-        <!-- ปรับให้ ul ครอบ li อย่างถูกต้อง -->
-        <li><a href="#" class="menu-link">Home</a></li>
-        <li><a href="#" class="menu-link">About</a></li>
-        <li><a href="#" class="menu-link">Contact</a></li>
-      </ul>
-    </nav>
-  </aside>
+  <div class="menu-bar">
+    <router-link 
+      to="/instructors"
+      class="menu-item"
+      :class="{ active: $route.path === '/instructors' }"
+    >
+      จัดการข้อมูลอาจารย์
+    </router-link>
+    <router-link 
+      to="/rooms"
+      class="menu-item"
+      :class="{ active: $route.path === '/rooms' }"
+    >
+      จัดการข้อมูลห้อง
+    </router-link>
+  </div>
 </template>
 
 <script>
 export default {
-  name: "MenuBar",
-};
+  name: 'MenuBar'
+}
 </script>
 
 <style scoped>
-.colorBG {
-  background-color: #2f2f30;
+.menu-bar {
+  width: 250px;
+  min-height: calc(100vh - 64px); /* ปรับตามความสูงของ HeaderBar */
+  background-color: #f4f6ff;
+  padding: 1rem;
 }
 
-.ConfigMenu {
-  color: #ffffff;
-  margin: 10px 1px;
-  font-size: 15px;
-  padding: 10px;
-}
-
-/* ปรับการจัดสไตล์ของลิงก์ในเมนู */
-.menu-link {
+.menu-item {
   display: block;
-  padding: 10px;
-  color: #ffffff;
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.5rem;
+  color: #4a5568;
   text-decoration: none;
-  border-radius: 4px;
-  transition: background-color 0.3s;
+  border-radius: 0.375rem;
+  transition: all 0.2s;
 }
 
-/* เพิ่มเอฟเฟกต์ hover */
-.menu-link:hover {
-  background-color: #494948;
+.menu-item:hover {
+  background-color: #e2e8f0;
+}
+
+.menu-item.active {
+  background-color: #2196f3;
+  color: white;
 }
 </style>

@@ -1,3 +1,4 @@
+<!-- src/components/TableComponent.vue -->
 <template>
   <div>
     <h2>{{ textHeader }}</h2>
@@ -12,14 +13,31 @@
         <tr v-for="(row, rowIndex) in displayedData" :key="rowIndex">
           <td v-for="(cell, cellIndex) in row" :key="cellIndex">
             <div v-if="editRowIndex === rowIndex">
-              <input
-                v-model="editRow[cellIndex]"
-                :placeholder="'แก้ไข ' + headers[cellIndex]"
-                :disabled="cellIndex === 0"
-              />
+              <template v-if="headers[cellIndex] === 'ห้องพัก'">
+                <select v-model="editRow[cellIndex]">
+                  <option value="" disabled>เลือกห้องพัก</option>
+                  <option v-for="room in roomOptions" 
+                          :key="room.room_id" 
+                          :value="room.room_id">
+                    {{ room.room_name }}
+                  </option>
+                </select>
+              </template>
+              <template v-else>
+                <input
+                  v-model="editRow[cellIndex]"
+                  :placeholder="'แก้ไข ' + headers[cellIndex]"
+                  :disabled="cellIndex === 0"
+                />
+              </template>
             </div>
             <div v-else>
-              {{ cell }}
+              <template v-if="headers[cellIndex] === 'ห้องพัก'">
+                {{ getRoomName(cell) }}
+              </template>
+              <template v-else>
+                {{ cell }}
+              </template>
             </div>
           </td>
           <td>
@@ -34,10 +52,25 @@
       <h3>เพิ่มข้อมูลใหม่</h3>
       <div v-for="(header, index) in headers.slice(1)" :key="index">
         <label>{{ header }}</label>
-        <input v-model="newRow[index]" :placeholder="'กรอก ' + header" />
+        <template v-if="header === 'ห้องพัก'">
+          <select v-model="newRow[index]">
+            <option value="" disabled selected>เลือกห้องพัก</option>
+            <option v-for="room in roomOptions" 
+                    :key="room.room_id" 
+                    :value="room.room_id">
+              {{ room.room_name }}
+            </option>
+          </select>
+        </template>
+        <template v-else>
+          <input v-model="newRow[index]" :placeholder="'กรอก ' + header" />
+        </template>
       </div>
       <button @click="addRow">เพิ่ม</button>
       <button @click="cancelAddRow">ยกเลิก</button>
+      <div v-if="errorMessage" class="error-message">
+        {{ errorMessage }}
+      </div>
     </div>
     <button @click="toggleAddRow" class="add-button">เพิ่มข้อมูล</button>
   </div>
@@ -45,64 +78,91 @@
 
 <script>
 export default {
-  props: ['textHeader', 'headers', 'data'],
+  props: {
+    textHeader: String,
+    headers: Array,
+    data: Array,
+    roomOptions: {
+      type: Array,
+      required: true,
+      default: () => []
+    }
+  },
+  
   data() {
     return {
       internalData: [...this.data],
       editRowIndex: null,
       editRow: [],
       showAddForm: false,
-      newRow: Array(this.headers.length - 1).fill(""), // ไม่รวม ID
-      errorMessage: "", // เพิ่มการแจ้งเตือนข้อผิดพลาด
+      newRow: Array(this.headers.length - 1).fill(""),
+      errorMessage: "",
     };
   },
+
   watch: {
     data(newData) {
       this.internalData = [...newData];
     }
   },
+
   methods: {
+    // เพิ่มฟังก์ชัน getRoomName
+    getRoomName(roomId) {
+      if (!this.roomOptions) return roomId;
+      const room = this.roomOptions.find(room => room.room_id === parseInt(roomId));
+      return room ? room.room_name : roomId;
+    },
+
     toggleAddRow() {
       this.showAddForm = !this.showAddForm;
       this.newRow = Array(this.headers.length - 1).fill("");
-      this.errorMessage = ""; // ล้างข้อความแจ้งเตือนเมื่อเริ่มการเพิ่มข้อมูลใหม่
+      this.errorMessage = "";
     },
+
     addRow() {
       if (this.newRow.some(field => !field)) {
         this.errorMessage = "กรุณากรอกข้อมูลให้ครบถ้วน";
         return;
       }
+      
       this.$emit("add", this.newRow);
       this.showAddForm = false;
-      this.errorMessage = ""; // ล้างข้อความแจ้งเตือนหลังการเพิ่มข้อมูลสำเร็จ
+      this.errorMessage = "";
     },
+
     editRowData(row, index) {
       this.editRowIndex = index;
       this.editRow = [...row];
-      this.errorMessage = ""; // ล้างข้อความแจ้งเตือนเมื่อเริ่มแก้ไขข้อมูล
+      this.errorMessage = "";
     },
+
     saveRow() {
       if (this.editRow.some((field, index) => !field && index !== 0)) {
         this.errorMessage = "กรุณากรอกข้อมูลให้ครบถ้วน";
         return;
       }
+      
       this.$emit("update", { updatedRow: this.editRow });
       this.editRowIndex = null;
-      this.errorMessage = ""; // ล้างข้อความแจ้งเตือนหลังการบันทึกข้อมูลสำเร็จ
+      this.errorMessage = "";
     },
+
     deleteRow(index) {
       const id = this.internalData[index][0];
       this.$emit("delete", id);
     },
+
     cancelAddRow() {
       this.showAddForm = false;
-      this.errorMessage = ""; // ล้างข้อความแจ้งเตือนเมื่อยกเลิกการเพิ่มข้อมูล
+      this.errorMessage = "";
     },
   },
+
   computed: {
     displayedData() {
       return this.internalData.slice().sort((a, b) => a[0] - b[0]);
-    },
+    }
   }
 };
 </script>
@@ -113,14 +173,17 @@ table {
   border-collapse: collapse;
   margin-bottom: 1rem;
 }
+
 th, td {
   border: 1px solid #ddd;
   padding: 8px;
   text-align: left;
 }
+
 th {
   background-color: #f4f4f4;
 }
+
 button {
   background-color: #2196f3;
   color: white;
@@ -131,16 +194,20 @@ button {
   margin-right: 4px;
   transition: background-color 0.3s;
 }
+
 button:hover {
   background-color: #1976d2;
 }
+
 .add-button {
   margin-top: 1rem;
   background-color: #4caf50;
 }
+
 .add-button:hover {
   background-color: #388e3c;
 }
+
 .add-form {
   margin-top: 1rem;
   padding: 1rem;
@@ -148,6 +215,15 @@ button:hover {
   border-radius: 8px;
   background-color: #f9f9f9;
 }
+
+select {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin-top: 4px;
+}
+
 .error-message {
   color: red;
   margin-top: 1rem;

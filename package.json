@@ -14,7 +14,8 @@
     "dotenv": "^16.4.5",
     "express": "^4.21.1",
     "mysql2": "^3.11.3",
-    "vue": "^3.2.13"
+    "vue": "^3.2.13",
+    "vue-router": "^4.4.5"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",
