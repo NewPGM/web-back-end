@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const pool = require('./config/db'); // แก้ไขเป็นตัวพิมพ์เล็ก
+const pool = require('../config/db'); // แก้ไขเป็นตัวพิมพ์เล็ก
 
 // ฟังก์ชันทั่วไปสำหรับจัดการการทำงานกับฐานข้อมูล
 async function executeQuery(query, params, res, successMessage) {

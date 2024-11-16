@@ -1,7 +1,7 @@
 // server/routes/rooms.js
 const express = require('express');
 const router = express.Router();
-const pool = require('../config/DB');
+const pool = require('../config/db');
 
 // Get all rooms
 router.get('/', async (req, res) => {

@@ -1,7 +1,7 @@
 // server/routes/locations.js
 const express = require('express');
 const router = express.Router();
-const pool = require('./config/db');
+const pool = require('../config/db');
 
 // ฟังก์ชันทั่วไปสำหรับจัดการการทำงานกับฐานข้อมูล
 async function executeQuery(query, params, res, successMessage) {

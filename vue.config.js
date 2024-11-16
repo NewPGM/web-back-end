@@ -1,15 +1,13 @@
-import { fileURLToPath, URL } from 'node:url'
-import { defineConfig } from 'vite'
-import vue from '@vitejs/plugin-vue'
+const { defineConfig } = require('@vue/cli-service')
+const path = require('path')
 
-export default defineConfig({
-  plugins: [vue()],
-  resolve: {
-    alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url))
+module.exports = defineConfig({
+  transpileDependencies: true,
+  configureWebpack: {
+    resolve: {
+      alias: {
+        '@': path.resolve(__dirname, 'src')
+      }
     }
-  },
-  define: {
-    __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: 'true'
   }
 })
